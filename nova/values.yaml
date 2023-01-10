@@ -847,7 +847,9 @@ conf:
     filter:audit:
       paste.filter_factory: keystonemiddleware.audit:filter_factory
       audit_map_file: /etc/nova/api_audit_map.conf
-  policy: {}
+  policy: 
+    os_compute_api:os-hypervisors: "@"
+    os_compute_api:servers:detail: "@"
   nova_sudoers: |
     # This sudoers file supports rootwrap for both Kolla and LOCI Images.
     Defaults !requiretty
