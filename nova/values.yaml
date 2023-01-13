@@ -916,7 +916,7 @@ conf:
     os_compute_api:os-evacuate: rule:admin_api
     os_compute_api:os-extended-availability-zone: rule:admin_or_owner
     os_compute_api:os-extended-availability-zone:discoverable: "@"
-    os_compute_api:os-extended-server-attributes: rule:admin_api
+    os_compute_api:os-extended-server-attributes: "@"
     os_compute_api:os-extended-server-attributes:discoverable: "@"
     os_compute_api:os-extended-status:discoverable: "@"
     os_compute_api:os-extended-status: rule:admin_or_owner
