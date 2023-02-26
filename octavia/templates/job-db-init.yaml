@@ -1,6 +1,4 @@
 {{/*
-Copyright 2019 Samsung Electronics Co., Ltd.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -20,6 +18,13 @@ helm.sh/hook-weight: "-5"
 {{- end }}
 
 {{- if .Values.manifests.job_db_init }}
-{{- $dbInitJob := dict "envAll" . "serviceName" "octavia" "jobAnnotations" (include "metadata.annotations.job.db_init" . | fromYaml) -}}
+{{- $serviceName := "octavia" -}}
+{{- $dbSvc := dict "adminSecret" .Values.secrets.oslo_db.admin "configFile" (printf "/etc/%s/%s.conf" $serviceName $serviceName ) "logConfigFile" (printf "/etc/%s/logging.conf" $serviceName ) "configDbSection" "database" "configDbKey" "connection" -}}
+{{- $dbsToInit := list $dbSvc }}
+{{- if .Values.conf.octavia.task_flow.jobboard_enabled }}
+{{- $dbPersistence := dict "adminSecret" .Values.secrets.oslo_db.admin "configFile" (printf "/etc/%s/%s.conf" $serviceName $serviceName ) "logConfigFile" (printf "/etc/%s/logging.conf" $serviceName ) "configDbSection" "task_flow" "configDbKey" "persistence_connection" -}}
+{{- $dbsToInit = list $dbSvc $dbPersistence }}
+{{- end }}
+{{- $dbInitJob := dict "envAll" . "serviceName" $serviceName "dbsToInit" $dbsToInit -}}
 {{ $dbInitJob | include "helm-toolkit.manifests.job_db_init_mysql" }}
 {{- end }}

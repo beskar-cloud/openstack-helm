@@ -211,6 +211,8 @@ conf:
     api_settings:
       api_handler: queue_producer
       bind_host: 0.0.0.0
+    task_flow:
+      jobboard_enabled: False
     database:
       max_retries: -1
     health_manager:
@@ -343,6 +345,9 @@ secrets:
   oslo_db:
     admin: octavia-db-admin
     octavia: octavia-db-user
+  oslo_db_persistence:
+    admin: octavia-db-persistence-admin
+    octavia: octavia-db-persistence-user
   oslo_messaging:
     admin: octavia-rabbitmq-admin
     octavia: octavia-rabbitmq-user
@@ -436,6 +441,23 @@ endpoints:
       api:
         default: 9876
         public: 80
+  oslo_db_persistence:
+    auth:
+      admin:
+        username: root
+        password: password
+      octavia:
+        username: octavia
+        password: password
+    hosts:
+      default: mariadb
+    host_fqdn_override:
+      default: null
+    path: /octavia_persistence
+    scheme: mysql+pymysql
+    port:
+      mysql:
+        default: 3306
   oslo_db:
     auth:
       admin:
@@ -695,6 +717,7 @@ manifests:
   network_policy: false
   secret_credential_keys: true
   secret_db: true
+  secret_db_persistence: true
   secret_ingress_tls: true
   secret_keystone: true
   secret_rabbitmq: true

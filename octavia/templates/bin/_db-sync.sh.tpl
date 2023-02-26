@@ -19,3 +19,6 @@ limitations under the License.
 set -ex
 
 octavia-db-manage upgrade head
+{{- if .Values.conf.octavia.task_flow.jobboard_enabled }}
+octavia-db-manage upgrade_persistence
+{{- end }}
