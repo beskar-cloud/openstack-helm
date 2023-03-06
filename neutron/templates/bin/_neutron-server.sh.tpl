@@ -34,6 +34,9 @@ function start () {
 {{- if .Values.conf.plugins.l2gateway }} \
         --config-file /etc/neutron/l2gw_plugin.ini
 {{- end }}
+{{- if .Values.conf.fwaas_driver }} \
+        --config-file /etc/neutron/fwaas_driver.ini
+{{- end }}
 }
 
 function stop () {
