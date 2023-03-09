@@ -1054,6 +1054,9 @@ conf:
     extra_panels:
       - heat_dashboard
       - neutron_taas_dashboard
+      - octavia_dashboard
+      - neutron_vpnaas_dashboard
+      - neutron_fwaas_dashboard
 
 dependencies:
   dynamic:
