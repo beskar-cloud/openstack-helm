@@ -40,3 +40,10 @@ neutron-db-manage \
   --subproject neutron-fwaas \
   upgrade head
 {{- end }}
+
+{{- if .Values.conf.neutron_vpnaas }}
+neutron-db-manage \
+  --config-file /etc/neutron/neutron.conf \
+  --subproject neutron-vpnaas \
+  upgrade head
+{{- end }}

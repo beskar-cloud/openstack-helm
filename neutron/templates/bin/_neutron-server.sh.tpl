@@ -37,6 +37,9 @@ function start () {
 {{- if .Values.conf.fwaas_driver }} \
         --config-file /etc/neutron/fwaas_driver.ini
 {{- end }}
+{{- if .Values.conf.neutron_vpnaas }} \
+        --config-file /etc/neutron/neutron_vpnaas.conf
+{{- end }}
 }
 
 function stop () {
