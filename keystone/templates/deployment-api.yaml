@@ -64,6 +64,40 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.pod.lifecycle.termination_grace_period.api.timeout | default "30" }}
       initContainers:
 {{ tuple $envAll "api" $mounts_keystone_api_init | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
+{{- if .Values.conf.software.apache2.oidc_metadata.conf_dir }}
+{{- range $provider_nickname, $provider_value := .Values.conf.software.apache2.oidc_providers }}
+        - command:
+            - /tmp/oidc-metadata-generator.sh
+          env:
+            - name: OIDC_METADATA_DIR
+              value: /tmp/oidc_metadata
+            - name: OIDC_FILE_PREFIX
+              value: {{ $provider_value.file_prefix | quote }}
+            - name: OIDC_PROVIDER_URL
+              value: {{ $provider_value.provider_url | quote }}
+            - name: OIDC_SCOPES
+              value: {{ $provider_value.scopes | quote }}
+            - name: OIDC_CLIENT_ID
+              value: {{ $provider_value.client_id | quote }}
+            - name: OIDC_CLIENT_SECRET
+              value: {{ $provider_value.client_secret | quote }}
+          image: {{ $.Values.images.tags.bootstrap }}
+          imagePullPolicy: IfNotPresent
+          name: {{ printf "oidc-metadata-generator-%s" ( $provider_nickname | replace "." "_" | replace "_" "-" ) | quote }}
+          securityContext:
+            allowPrivilegeEscalation: false
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - name: keystone-bin
+              mountPath: /tmp/oidc-metadata-generator.sh
+              subPath: oidc-metadata-generator.sh
+              readOnly: true
+            - name: apache2-oidc-metadata
+              mountPath: /tmp/oidc_metadata
+              readOnly: false
+{{- end }}
+{{- end }}
       containers:
         - name: keystone-api
 {{ tuple $envAll "keystone_api" | include "helm-toolkit.snippets.image" | indent 10 }}
@@ -150,6 +184,10 @@ spec:
 {{- end }}
             - name: keystone-credential-keys
               mountPath: {{ .Values.conf.keystone.credential.key_repository }}
+{{- if .Values.conf.software.apache2.oidc_metadata.conf_dir }}
+            - name: apache2-oidc-metadata
+              mountPath: {{ .Values.conf.software.apache2.oidc_metadata.conf_dir }}
+{{- end }}
 {{- if and $envAll.Values.manifests.certificates $envAll.Values.endpoints.oslo_db.auth.admin.secret.tls.internal }}
 {{- dict "enabled" $envAll.Values.manifests.certificates "name" $envAll.Values.endpoints.oslo_db.auth.admin.secret.tls.internal "path" "/etc/mysql/certs" | include "helm-toolkit.snippets.tls_volume_mount" | indent 12 }}
 {{- end }}
@@ -192,6 +230,10 @@ spec:
         - name: keystone-credential-keys
           secret:
             secretName: keystone-credential-keys
+{{- if .Values.conf.software.apache2.oidc_metadata.conf_dir }}
+        - name: apache2-oidc-metadata
+          emptyDir: {}
+{{- end }}
 {{- if and $envAll.Values.manifests.certificates $envAll.Values.endpoints.oslo_db.auth.admin.secret.tls.internal }}
 {{- dict "enabled" $envAll.Values.manifests.certificates "name" $envAll.Values.endpoints.oslo_db.auth.admin.secret.tls.internal | include "helm-toolkit.snippets.tls_volume" | indent 8 }}
 {{- end }}
