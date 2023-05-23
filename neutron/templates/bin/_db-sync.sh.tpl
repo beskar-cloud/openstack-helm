@@ -16,6 +16,14 @@ limitations under the License.
 
 set -ex
 
+# fix f010820fc498_add_unique_quotas_project_resource migration
+migration_file=$(find /var/lib/ -name "f010820fc498_add_unique_quotas_project_resource.py" || true)
+
+if [ -s "${migration_file}" ]; then
+  cp -vf "${migration_file}" "${migration_file}.backup"
+  sed 's|quotas.c.project_id|quotas.c.tenant_id|g' "${migration_file}.backup" > "${migration_file}"
+fi
+
 neutron-db-manage \
   --config-file /etc/neutron/neutron.conf \
 {{- if ( has "tungstenfabric" .Values.network.backend ) }}
