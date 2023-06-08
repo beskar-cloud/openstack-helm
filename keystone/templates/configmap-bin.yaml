@@ -55,4 +55,6 @@ data:
 {{ tuple "bin/_domain-manage.py.tpl" . | include "helm-toolkit.utils.template" | indent 4 }}
   rabbit-init.sh: |
 {{- include "helm-toolkit.scripts.rabbit_init" . | indent 4 }}
+  oidc-metadata-generator.sh: |
+{{ tuple "bin/_oidc-metadata-generator.sh.tpl" . | include "helm-toolkit.utils.template" | indent 4 }}
 {{- end }}
