@@ -54,24 +54,27 @@ exec:
 {{- $mounts_neutron_l3_agent := .Values.pod.mounts.neutron_l3_agent.neutron_l3_agent }}
 {{- $mounts_neutron_l3_agent_init := .Values.pod.mounts.neutron_l3_agent.init_container }}
 
+# L3 agent manifest name used to override all related manifests names (l3-agent vs l3-agent-snat)
+{{- $l3_agent_manifest_name := .Values.conf.l3_agent.manifest_name }}
+
 ---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: neutron-l3-agent
+  name: {{ printf "neutron-%s" $l3_agent_manifest_name }}
   annotations:
     {{ tuple $envAll | include "helm-toolkit.snippets.release_uuid" }}
   labels:
-{{ tuple $envAll "neutron" "l3-agent" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 4 }}
+{{ tuple $envAll "neutron" $l3_agent_manifest_name | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 4 }}
 spec:
   selector:
     matchLabels:
-{{ tuple $envAll "neutron" "l3-agent" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 6 }}
+{{ tuple $envAll "neutron" $l3_agent_manifest_name | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 6 }}
 {{ tuple $envAll "l3_agent" | include "helm-toolkit.snippets.kubernetes_upgrades_daemonset" | indent 2 }}
   template:
     metadata:
       labels:
-{{ tuple $envAll "neutron" "l3-agent" | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
+{{ tuple $envAll "neutron" $l3_agent_manifest_name | include "helm-toolkit.snippets.kubernetes_metadata_labels" | indent 8 }}
       annotations:
 {{ tuple $envAll | include "helm-toolkit.snippets.release_uuid" | indent 8 }}
         configmap-bin-hash: {{ tuple "configmap-bin.yaml" . | include "helm-toolkit.utils.hash" }}
@@ -283,9 +286,9 @@ spec:
 
 {{- if .Values.manifests.daemonset_l3_agent }}
 {{- $envAll := . }}
-{{- $daemonset := "l3-agent" }}
+{{- $daemonset := $envAll.Values.conf.l3_agent.manifest_name }}
 {{- $configMapName := "neutron-etc" }}
-{{- $serviceAccountName := "neutron-l3-agent" }}
+{{- $serviceAccountName := printf "neutron-%s" $envAll.Values.conf.l3_agent.manifest_name }}
 {{- $dependencyOpts := dict "envAll" $envAll "dependencyMixinParam" $envAll.Values.network.backend "dependencyKey" "l3" -}}
 {{- $_ := include "helm-toolkit.utils.dependency_resolver" $dependencyOpts | toString | fromYaml }}
 {{ tuple $envAll "pod_dependency" $serviceAccountName | include "helm-toolkit.snippets.kubernetes_pod_rbac_serviceaccount" }}

@@ -1891,6 +1891,7 @@ conf:
       #dhcp-option-force=26,1450
 
   l3_agent:
+    manifest_name: "l3-agent"
     DEFAULT:
       # (NOTE)portdirect: if unset this is populated dyanmicly from the value in
       # 'network.backend' to sane defaults.
