@@ -260,8 +260,8 @@ data:
   policy.yaml: {{ toYaml $envAll.Values.conf.policy | b64enc }}
   neutron.conf: {{ include "helm-toolkit.utils.to_oslo_conf" $envAll.Values.conf.neutron | b64enc }}
   logging.conf: {{ include "helm-toolkit.utils.to_oslo_conf" .Values.conf.logging | b64enc }}
-  fwaas_driver.ini: {{ include "helm-toolkit.utils.to_oslo_conf" .Values.conf.fwaas_driver | b64enc }}
-  neutron_vpnaas.conf: {{ include "helm-toolkit.utils.to_oslo_conf" .Values.conf.neutron_vpnaas | b64enc }}
+  fwaas_driver.ini: {{ default "\"\"" (include "helm-toolkit.utils.to_oslo_conf" .Values.conf.fwaas_driver | b64enc) }}
+  neutron_vpnaas.conf: {{ default "\"\"" (include "helm-toolkit.utils.to_oslo_conf" .Values.conf.neutron_vpnaas | b64enc) }}
   api_audit_map.conf: {{ include "helm-toolkit.utils.to_oslo_conf" .Values.conf.api_audit_map | b64enc }}
   dhcp_agent.ini: {{ include "helm-toolkit.utils.to_oslo_conf" $envAll.Values.conf.dhcp_agent | b64enc }}
   l3_agent.ini: {{ include "helm-toolkit.utils.to_oslo_conf" $envAll.Values.conf.l3_agent | b64enc }}
