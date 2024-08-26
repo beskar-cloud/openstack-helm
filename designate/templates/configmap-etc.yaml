@@ -73,6 +73,8 @@ metadata:
 type: Opaque
 data:
   designate.conf: {{ include "helm-toolkit.utils.to_oslo_conf" .Values.conf.designate | b64enc }}
+  rndc.conf: {{ .Values.conf.rndc_conf | b64enc }}
+  rndc.key: {{ .Values.conf.rndc_key | b64enc }}
   api-paste.ini: {{ include "helm-toolkit.utils.to_ini" .Values.conf.paste | b64enc }}
   policy.yaml: {{ toYaml .Values.conf.policy | b64enc }}
   logging.conf: {{ include "helm-toolkit.utils.to_oslo_conf" .Values.conf.logging | b64enc }}
