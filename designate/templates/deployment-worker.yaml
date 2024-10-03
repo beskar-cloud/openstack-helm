@@ -46,6 +46,7 @@ spec:
 {{ tuple $envAll "designate" "worker" | include "helm-toolkit.snippets.kubernetes_pod_anti_affinity" | indent 8 }}
       nodeSelector:
         {{ .Values.labels.worker.node_selector_key }}: {{ .Values.labels.worker.node_selector_value }}
+      hostNetwork: true
       initContainers:
 {{ tuple $envAll "worker" $mounts_designate_worker_init | include "helm-toolkit.snippets.kubernetes_entrypoint_init_container" | indent 8 }}
         - name: designate-worker-init
@@ -66,6 +67,14 @@ spec:
               mountPath: /etc/designate/designate.conf
               subPath: designate.conf
               readOnly: true
+            - name: designate-etc
+              mountPath: /etc/designate/rndc.conf
+              subPath: rndc.conf
+              readOnly: false
+            - name: designate-etc
+              mountPath: /etc/designate/rndc.key
+              subPath: rndc.key
+              readOnly: false
             {{- if .Values.conf.designate.DEFAULT.log_config_append }}
             - name: designate-etc
               mountPath: {{ .Values.conf.designate.DEFAULT.log_config_append }}
@@ -94,6 +103,14 @@ spec:
               mountPath: /etc/designate/designate.conf
               subPath: designate.conf
               readOnly: true
+            - name: designate-etc
+              mountPath: /etc/designate/rndc.conf
+              subPath: rndc.conf
+              readOnly: false
+            - name: designate-etc
+              mountPath: /etc/designate/rndc.key
+              subPath: rndc.key
+              readOnly: false
             - name: designate-etc
               mountPath: /etc/designate/api-paste.ini
               subPath: api-paste.ini
