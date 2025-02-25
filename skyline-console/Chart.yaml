@@ -8,6 +8,3 @@ icon: https://www.openstack.org/themes/openstack/images/project-mascots/skyline-
 sources:
   - https://opendev.org/openstack/skyline-console
   - https://opendev.org/openstack/openstack-helm
-maintainers:
-  - name: Joao Junior
-  - name: Shubham
