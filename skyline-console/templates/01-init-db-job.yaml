@@ -1,0 +1,56 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: skyline-console-init-db
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 180
+  template:
+    spec:
+      containers:
+        - name: init-db
+          image: mysql:8.0
+          command: ["/bin/bash", "/usr/local/bin/_init-db.sh"]
+          envFrom:
+            - secretRef:
+                name: {{ .Chart.Name }}-mysql-credentials
+          # Mount the MySQL credentials as environment variables from the secret
+          # Secret must include: host, rootPassword, database, user, and password
+          env:
+            - name: MYSQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Chart.Name }}-mysql-credentials
+                  key: host
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Chart.Name }}-mysql-credentials
+                  key: rootPassword
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Chart.Name }}-mysql-credentials
+                  key: database
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Chart.Name }}-mysql-credentials
+                  key: user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Chart.Name }}-mysql-credentials
+                  key: password
+          volumeMounts:
+            - name: scripts
+              mountPath: /usr/local/bin/_init-db.sh
+              subPath: _init-db.sh
+      volumes:
+        - name: scripts
+          configMap:
+            name: {{ .Chart.Name }}-scripts
+      restartPolicy: Never
+

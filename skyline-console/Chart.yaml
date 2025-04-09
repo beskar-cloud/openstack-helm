@@ -1,0 +1,10 @@
+apiVersion: v1
+appVersion: v1.0.0
+description: OpenStack-Helm Skyline-Console
+name: skyline-console
+version: 0.1.0
+home: https://docs.openstack.org/skyline-console/latest/
+icon: https://www.openstack.org/themes/openstack/images/project-mascots/skyline-console/skyline-console.png
+sources:
+  - https://opendev.org/openstack/skyline-console
+  - https://opendev.org/openstack/openstack-helm

@@ -1,0 +1,213 @@
+# Namespace where the application will be deployed
+namespace: openstack
+
+# Deployment settings - number of replicas and image configuration
+replicaCount: 1  # Number of replicas for the deployment
+
+# Container port settings for both the init container and main application container
+containerPort: 9999  # The port for the main application container
+initContainerPort: 9999  # The port for the init container
+
+# Readiness probe settings - configuration for readiness health checks
+readinessProbe:
+  # The URL path to use for readiness probe
+  path: /health
+  # The port on which the readiness probe will check the service
+  port: 9999
+  # Initial delay before the first readiness probe is initiated (in seconds)
+  initialDelaySeconds: 5
+  # Interval between successive readiness probes (in seconds)
+  periodSeconds: 10
+  # Number of failed readiness probes before marking the container as unready
+  failureThreshold: 3
+
+# Liveness probe settings - configuration for liveness health checks
+livenessProbe:
+  # The URL path to use for liveness probe
+  path: /health
+  # The port on which the liveness probe will check the service
+  port: 9999
+  # Initial delay before the first liveness probe is initiated (in seconds)
+  initialDelaySeconds: 30
+  # Interval between successive liveness probes (in seconds)
+  periodSeconds: 30
+  # Number of failed liveness probes before restarting the container
+  failureThreshold: 3
+
+# Image settings for both the main app and init container
+image:
+  # The repository where the container image is stored
+  repository: 99cloud/skyline
+  # The version or tag of the container image to use
+  tag: latest
+  # The pull policy for the container image (e.g., Always, IfNotPresent, Never)
+  pullPolicy: Always
+
+# Image settings for the init container
+bootstrapImage:
+  # The repository for the init container image
+  repository: 99cloud/skyline
+  # The version or tag of the init container image
+  tag: latest
+
+# MySQL credentials - used by the application and initialization job
+mysql:
+  # The hostname or IP address of the MySQL server
+  host: "<your-mysql-host>"
+  # The root password for MySQL (ensure this is stored securely)
+  rootPassword: "<your-root-password>"
+  # The name of the MySQL database to be used by the application
+  database: "<your-database-name>"
+  # The MySQL user that the application will use to access the database
+  user: "<your-username-for-skyline>"
+  # The password for the MySQL user
+  password: "<your-password>"
+
+# Service settings - configuration for the service exposing the application
+service:
+  # The network protocol used by the service (e.g., TCP, UDP)
+  protocol: TCP
+  # The type of Kubernetes service to expose (e.g., ClusterIP, NodePort, LoadBalancer)
+  type: NodePort
+  # The port on which the service will be exposed
+  port: 9999
+  # The port on the container that the service should forward traffic to
+  targetPort: 9999
+  # The port on each node on which the service is exposed when using NodePort
+  nodePort: 32000  
+
+
+# Skyline application settings - various parameters related to application behavior
+skyline_settings:
+  # Example settings (e.g., database URL, debug settings)
+  # Add actual settings as per your application's requirement
+  default:
+    # Access token expiration time in seconds
+    access_token_expire: 3600
+    # Access token renewal interval in seconds
+    access_token_renew: 1800
+    # Path to the CA certificate file (empty if not used)
+    cafile: ''
+    # CORS allowed origins (empty for no restrictions)
+    cors_allow_origins: []
+    # Database URL (SQLite by default)
+    database_url: sqlite:////tmp/skyline.db
+    # Enable/disable debug mode (set to true for debugging purposes)
+    debug: false
+    # Directory where application logs will be stored
+    log_dir: ./log
+    # Log file name
+    log_file: skyline.log
+    # Path to the policy file
+    policy_file_path: /etc/skyline/policy
+    # Suffix for the policy file (e.g., policy.yaml)
+    policy_file_suffix: policy.yaml
+    # Prometheus Basic Auth credentials (empty by default)
+    prometheus_basic_auth_password: ''
+    prometheus_basic_auth_user: ''
+    # Enable/disable Prometheus Basic Authentication
+    prometheus_enable_basic_auth: false
+    # Prometheus endpoint URL
+    prometheus_endpoint: http://localhost:9091
+    # Secret key used for encryption (ensure this is securely managed)
+    secret_key: aCtmgbcUqYUy_HNVg5BDXCaeJgJQzHJXwqbXr0Nmb28o
+    # Session name for the application
+    session_name: session
+    # Enable/disable SSL for secure communication
+    ssl_enabled: true
+
+  # OpenStack settings - configuration specific to OpenStack integration
+  openstack:
+    # List of OpenStack service domains (e.g., heat_user_domain)
+    base_domains:
+    - heat_user_domain
+    # Default OpenStack region to use
+    default_region: RegionOne
+    # Enforce new OpenStack defaults
+    enforce_new_defaults: true
+    # Extension mapping for OpenStack services
+    extension_mapping:
+      floating-ip-port-forwarding: neutron_port_forwarding
+      fwaas_v2: neutron_firewall
+      qos: neutron_qos
+      vpnaas: neutron_vpn
+    # Network interface type for OpenStack services
+    interface_type: public
+    # Keystone authentication service URL
+    keystone_url: http://127.0.0.1:5000/v3/
+    # Nginx API prefix for OpenStack services
+    nginx_prefix: /api/openstack
+    # Instance reclaim interval (in seconds, e.g., 1 week)
+    reclaim_instance_interval: 604800
+    # Mapping of OpenStack services to components
+    service_mapping:
+      #baremetal: ironic
+      compute: nova
+      #container: zun
+      #container-infra: magnum
+      #database: trove
+      dns: designate
+      identity: keystone
+      image: glance
+      #instance-ha: masakari
+      key-manager: barbican
+      load-balancer: octavia
+      network: neutron
+      object-store: swift
+      orchestration: heat
+      placement: placement
+      sharev2: manilav2
+      volumev3: cinder
+    # Enable/disable Single Sign-On (SSO)
+    sso_enabled: false
+    # List of supported SSO protocols
+    sso_protocols:
+    - openid
+    # SSO region configuration
+    sso_region: RegionOne
+    # System admin roles for OpenStack
+    system_admin_roles:
+    - admin
+    - system_admin
+    # System project name in OpenStack
+    system_project: service
+    # Domain for system project
+    system_project_domain: Default
+    # System reader roles
+    system_reader_roles:
+    - system_reader
+    # System user credentials for OpenStack
+    system_user_domain: Default
+    system_user_name: skyline
+    system_user_password: ''
+
+  # Application settings for different hardware flavors, GPU models, and USB models
+  setting:
+    base_settings:
+    - flavor_families
+    - gpu_models
+    - usb_models
+    # Flavor families based on architecture and category
+    flavor_families:
+    - architecture: x86_architecture
+      categories:
+      - name: general_purpose
+        properties: []
+      - name: compute_optimized
+        properties: []
+      - name: memory_optimized
+        properties: []
+      - name: high_clock_speed
+        properties: []
+    - architecture: heterogeneous_computing
+      categories:
+      - name: compute_optimized_type_with_gpu
+        properties: []
+      - name: visualization_compute_optimized_type_with_gpu
+        properties: []
+    # GPU models supported by the system
+    gpu_models:
+    - nvidia_t4
+    # USB models supported by the system
+    usb_models:
+    - usb_c
